@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <common/shader.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 GLFWwindow* window;
 using namespace glm;
@@ -23,8 +24,7 @@ int main( void )
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	// Open a window and create its OpenGL context
-	window = glfwCreateWindow( 1024, 768, "Tutorial 02 - Red triangle", NULL, NULL);
+	window = glfwCreateWindow( 1024, 768, "Tutorial 03", NULL, NULL);
 	if( window == NULL ){
 		fprintf( stderr, "Failed to open GLFW window. If you have an Intel GPU, they are not 3.3 compatible. Try the 2.1 version of the tutorials.\n" );
 		getchar();
@@ -41,31 +41,36 @@ int main( void )
 		glfwTerminate();
 		return -1;
 	}
-
-	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
-
-	// Dark blue background
 	glClearColor(0.0f, 0.0f, 0.4f, 0.0f);
-
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	// Create and compile our GLSL program from the shaders
-	GLuint programID = LoadShaders( "SimpleVertexShader.vertexshader", "SimpleFragmentShader.fragmentshader" );
-
-
+	GLuint programID = LoadShaders( "SimpleTransform.vertexshader", "SingleColor.fragmentshader" );
+  
+  GLuint MatrixID = glGetUniformLocation(programID, "MVP");
+  glm::mat4 Projection = glm::perspective(95.0f, 8.0f/3.0f, 0.1f, 100.0f);
+  glm::mat4 View = glm::lookAt(
+    glm::vec3(4,3,3),
+    glm::vec3(0,0,0),
+    glm::vec3(0,1,0)
+  );
+  glm::mat4 Model = glm::mat4(1.0f);
+  glm::mat4 MVP = Projection * View * Model;
+  
 	static const GLfloat g_vertex_buffer_data[] = {
 		-1.0f, -1.0f, 0.0f,
 		 1.0f, -1.0f, 0.0f,
 		 0.0f,  1.0f, 0.0f,
 	};
+  static const GLushort g_element_buffer_data[] = {0,1,2};
 
 	GLuint vertexbuffer;
 	glGenBuffers(1, &vertexbuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+
 
 
 	// main loop
@@ -74,26 +79,23 @@ int main( void )
 		glClear( GL_COLOR_BUFFER_BIT );
 		glUseProgram(programID);
 
-		// 1rst attribute buffer : vertices
+    glUniformMatrix4fv(MatrixID, 1,GL_FALSE, &MVP[0][0]);
+
 		glEnableVertexAttribArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
 		glVertexAttribPointer(
-			0,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			3,                  // size
-			GL_FLOAT,           // type
-			GL_FALSE,           // normalized?
-			0,                  // stride
-			(void*)0            // array buffer offset
+			0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0  
 		);
+    
 
 		// Draw the triangle !
 		glDrawArrays(GL_TRIANGLES, 0, 3); // 3 indices starting at 0 -> 1 triangle
 		glDisableVertexAttribArray(0);
 
 		// Swap buffers
-		glfwSwapBuffers (window)
+		glfwSwapBuffers (window);
 		glfwPollEvents();
-
+    
 	} while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 		   glfwWindowShouldClose(window) == 0 );
 

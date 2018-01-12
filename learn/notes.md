@@ -15,3 +15,10 @@ add -lXcursor
 # fprintf
 printf == fprintf(stdout, ...)
 
+# fds
+install mesa-common-dev (OPENGL_INCLUDE_DIR)
+
+opengl-tutorial.org
+
+# #version 330 core
+needed to get function work

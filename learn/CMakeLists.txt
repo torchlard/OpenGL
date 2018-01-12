@@ -38,20 +38,43 @@ add_definitions(
 )
 
 # file 1
-add_executable(file01 file01.cpp)
-target_link_libraries(file01 ${ALL_LIBS})
+# add_executable(file01 file01.cpp)
+# target_link_libraries(file01 ${ALL_LIBS})
 
+# file02
+# add_executable(file02 file02.cpp common/shader.cpp common/shader.hpp
+#   SimpleFragmentShader.fragmentshader SimpleVertexShader.vertexshader)
+# target_link_libraries(file02 ${ALL_LIBS})
 
+# file03
+add_executable(file03 file03.cpp common/shader.cpp common/shader.hpp
+SingleColor.fragmentshader SimpleTransform.vertexshader
+)
+target_link_libraries(file03 ${ALL_LIBS})
 
 # ===============================
 
 SOURCE_GROUP(common REGULAR_EXPRESSION ".*/common.*")
 SOURCE_GROUP(shaders REGULAR_EXPRESSION ".*/shader$")
 
+# copy executable from build to project directory
+# add_custom_command(
+#   TARGET file01 POST_BUILD
+#   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/file01${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/"
+# )
+
+# add_custom_command(
+#   TARGET file02 POST_BUILD
+#   COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/file02${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/"
+# )
+
 add_custom_command(
-  TARGET file01 POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy
-  ${CMAKE_CURRENT_BINARY_DIR}/${}
+  TARGET file03 POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_CFG_INTDIR}/file03${CMAKE_EXECUTABLE_SUFFIX}" "${CMAKE_CURRENT_SOURCE_DIR}/"
 )
+
+
+
+
 
 

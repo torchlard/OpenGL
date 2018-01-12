@@ -38,7 +38,7 @@ int main(void){
 		return -1;
 	}
 
-	glClearColor(1.0f,0.0f,0.0f,0.0f);
+	glClearColor(0.5f,0.5f,0.5f,0.0f);
 
 	// ensure capture escape key being pressed
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
